@@ -1,8 +1,9 @@
-name: Montar HTML completo do portfolio
+name: Preparar paginas e metadados do portfolio
 on:
   push:
     paths:
       - 'site-parts/**'
+      - 'scripts/build_shareable_site.py'
       - '.github/workflows/build-site.yml'
   workflow_dispatch:
 
@@ -16,24 +17,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: true
-      - name: Unir os arquivos HTML em index.html
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          parts = sorted(Path('site-parts').glob('part-*.txt'))
-          assert len(parts) == 28, f'Esperadas 28 partes, encontradas {len(parts)}'
-          contents = ''.join(p.read_text(encoding='utf-8') for p in parts)
-          assert contents.startswith('<!DOCTYPE html>')
-          assert 'const AC_PAGES=' in contents
-          Path('index.html').write_text(contents, encoding='utf-8')
-          print(f'Arquivo index.html montado: {len(contents)} caracteres')
-          PY
-      - name: Salvar HTML completo no repositório
+      - name: Gerar nove paginas com URL proprio e metadados
+        run: python3 scripts/build_shareable_site.py
+      - name: Salvar paginas estaticas e sitemap
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html
+          git add index.html projetos/index.html publicacoes/index.html videos/index.html musica/index.html sobre/index.html bio-extratus/index.html batekoo/index.html documentario-dj/index.html sitemap.xml robots.txt .nojekyll
           if ! git diff --cached --quiet; then
-            git commit -m "Gera index.html completo para publicação"
+            git commit -m "Publica paginas individuais com metadados Open Graph"
             git push
           fi
