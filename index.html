@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Alícia Coura | Portfólio</title></head>
+<body style="margin:0;background:#f7f4ec;color:#262626;font:16px system-ui,sans-serif;display:grid;place-items:center;min-height:100vh">
+<div id="status" role="status">Carregando portfólio...</div>
+<script>
+(async()=>{
+try {
+  const names=Array.from({length:28},(_,i)=>'site-parts/part-'+String(i).padStart(3,'0')+'.txt');
+  const parts=await Promise.all(names.map(async(name)=>{
+    const r=await fetch(name,{cache:'force-cache'});
+    if(!r.ok)throw new Error('Arquivo indisponível: '+name);
+    return r.text();
+  }));
+  const html=parts.join('');
+  if(!html.startsWith('<!DOCTYPE html>')||!html.includes('const AC_PAGES=')) throw new Error('Site incompleto');
+  document.open();document.write(html);document.close();
+} catch(err) {
+ document.getElementById('status').textContent='Não foi possível carregar o site. Atualize a página.';
+ console.error(err);
+}
+})();
+</script>
+</body></html>
