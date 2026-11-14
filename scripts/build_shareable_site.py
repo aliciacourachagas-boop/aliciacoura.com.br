@@ -51,7 +51,7 @@ for slug in PAGES:
       f'<meta property="og:title" content="{esc(title)}">',
       f'<meta property="og:description" content="{esc(desc)}">',
       f'<meta property="og:url" content="{url}">',
-      f'<meta property="og:image" content="{DOMAIN}/assets/alicia-coura-og.jpg?v=logo2">',
+      f'<meta property="og:image" content="{DOMAIN}/assets/alicia-coura-og.jpg?v=logo-final">',
       '<meta property="og:image:width" content="1200">',
       '<meta property="og:image:height" content="630">',
       '<meta property="og:image:type" content="image/jpeg">',
