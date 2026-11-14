@@ -4,6 +4,7 @@ on:
     paths:
       - 'site-parts/**'
       - 'scripts/build_shareable_site.py'
+      - 'scripts/build_og_image.py'
       - '.github/workflows/build-site.yml'
   workflow_dispatch:
 
@@ -17,13 +18,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: true
+      - name: Instalar bibliotecas para reproduzir o logotipo SVG
+        run: python3 -m pip install --disable-pip-version-check pillow cairosvg
       - name: Gerar nove paginas com URL proprio e metadados
         run: python3 scripts/build_shareable_site.py
+      - name: Gerar imagem Open Graph a partir do logotipo existente
+        run: python3 scripts/build_og_image.py
       - name: Salvar paginas estaticas e sitemap
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html projetos/index.html publicacoes/index.html videos/index.html musica/index.html sobre/index.html bio-extratus/index.html batekoo/index.html documentario-dj/index.html sitemap.xml robots.txt .nojekyll
+          git add index.html projetos/index.html publicacoes/index.html videos/index.html lado-b/index.html musica/index.html sobre/index.html bio-extratus/index.html batekoo/index.html documentario-dj/index.html sitemap.xml robots.txt .nojekyll assets/alicia-coura-og.jpg
           if ! git diff --cached --quiet; then
             git commit -m "Publica paginas individuais com metadados Open Graph"
             git push
