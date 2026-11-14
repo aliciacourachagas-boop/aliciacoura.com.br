@@ -1,0 +1,39 @@
+name: Montar HTML completo do portfolio
+on:
+  push:
+    paths:
+      - 'site-parts/**'
+      - '.github/workflows/build-site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Unir os arquivos HTML em index.html
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          parts = sorted(Path('site-parts').glob('part-*.txt'))
+          assert len(parts) == 28, f'Esperadas 28 partes, encontradas {len(parts)}'
+          contents = ''.join(p.read_text(encoding='utf-8') for p in parts)
+          assert contents.startswith('<!DOCTYPE html>')
+          assert 'const AC_PAGES=' in contents
+          Path('index.html').write_text(contents, encoding='utf-8')
+          print(f'Arquivo index.html montado: {len(contents)} caracteres')
+          PY
+      - name: Salvar HTML completo no repositório
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Gera index.html completo para publicação"
+            git push
+          fi
